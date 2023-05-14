@@ -1,0 +1,107 @@
+{% load static %}
+<!DOCTYPE html>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+  <head>
+    <title>{% block title %}{{Name}}{% endblock %}</title>
+    {% block css %}
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="{% static 'assets/css/main.css' %}" />
+    {% endblock %}
+  </head>
+
+  <body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+      <!-- Main -->
+      <div id="main">
+        <div class="inner">
+          <!-- Header -->
+          <header id="header">
+            {% if user.is_authenticated %}
+            <a> Ваш рейтинг: {{ user.rating }}</a>
+            <a>Ваш ID (СНИЛС): {{ user.snils}}</a>
+            {% else %}
+            <a> Ваш рейтинг: неизвестно</a>
+            <a>Ваш ID (СНИЛС): войдите в систему</a>
+            {%endif%}
+          </header>
+
+          <!-- Section -->
+          <section>{% block content %}{% endblock %}</section>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div id="sidebar">
+        <div class="inner">
+          <!-- Search -->
+          <!-- <section id="search" class="alt">
+									<form method="post" action="#">
+										<input type="text" name="query" id="query" placeholder="Search" />
+									</form>
+								</section> -->
+
+          <!-- Menu -->
+          <nav id="menu">
+            <header class="major">
+              <h2>Меню</h2>
+              {% if user.is_authenticated %}
+              <a class="button primary" href="{% url 'logout' %}"> Выход </a>
+              {% else %}
+            	<a class="button primary fit" href="{% url 'login' %}"> Вход </a>
+              <p></p>
+            	<a class="button primary fit" href="{% url 'register' %}"> Регистрация </a>
+              {%endif%}
+            </header>
+            <ul>
+              <li><a href="index.html">Главная</a></li>
+              <li><a href="{% url 'profile' %}">Профиль</a></li>
+              <li><a href="#">Модерация</a></li>
+              <li>
+                <span class="opener">Положения</span>
+                <ul>
+                  <li><a href="#">Положение о доп. баллах</a></li>
+                  <li><a href="#">Положение о баллах</a></li>
+                </ul>
+              </li>
+            </ul>
+          </nav>
+
+          <!-- Section -->
+          <section>
+            <header class="major">
+              <h2>Нужна помощь?</h2>
+            </header>
+            <p>За помощью вы можете обращаться в деканат или председателю студенческого совета</p>
+            <ul class="contact">
+              <li class="icon solid fa-envelope"><a href="#">information@untitled.tld</a></li>
+              <li class="icon solid fa-phone">(000) 000-0000</li>
+              <li class="icon solid fa-home">
+                1234 Somewhere Road #8254<br />
+                Nashville, TN 00000-0000
+              </li>
+            </ul>
+          </section>
+
+          <!-- Footer -->
+          <footer id="footer">
+            <p class="copyright">&copy; Untitled. All rights reserved.</p>
+          </footer>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+    <script src="{% static 'assets/js/browser.min.js' %}"></script>
+    <script src="{% static 'assets/js/breakpoints.min.js' %}"></script>
+    <script src="{% static 'assets/js/util.js' %}"></script>
+    <script src="{% static 'assets/js/main.js' %}"></script>
+  </body>
+</html>

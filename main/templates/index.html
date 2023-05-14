@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Добро пожаловать в систему учета достижений студентов (Student Achievement Record System) - SARS</h1>
+    <article><strong>Здесь вы сможете загрузить свои достижения, обновить рейтинг и посмотреть свое место в общем рейтинге</strong></article>
+    {% if ticket_lists %}
+        {% for ticket in ticket_lists %}
+            <main>
+                
+              </main>
+        {% endfor %}
+    {% else %}
+        <p><br></p>
+    {% endif %}
+{% endblock %}
