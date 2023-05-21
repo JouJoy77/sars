@@ -12,36 +12,37 @@
   	</div>
 	  <main>
 		<div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
-		  {% for ticket in tickets %}
-			  <div class="col">
+		  {% for achievement in achievements %}
+			  <div class="content">
 				<div class="card mb-4 rounded-3 shadow-sm">
-				  <div class="card-header py-3">
-					<h4 class="my-0 fw-normal">{{ticket.title}}</h4>
-				  </div>
 				  <div class="card-body">
-					<h1 class="card-title pricing-card-title">{{ticket.price}} руб.</h1>
+					<h3 class="content">{{ achievement.title }}</h3>
+					<div class="thumbnail">
+						<a href="{{ MEDIA_URL }}{{achievement.get_picture }}" target="_blank">
+							<img src="{{ MEDIA_URL }}{{achievement.get_picture }}" alt="Изображение">
+						</a>
+					</div>
 					<ul class="list-unstyled mt-3 mb-4">
-					  <li>{{ticket.description}}</li>
-					  <li>ID: {{ticket.id_for_use}}</li>
-					  {% if ticket.can_use %}
-						<li>Талон отмечен как используемый</li>
-					  {% else %}
-						<li>Для использования нажмите кнопку ниже</li>
-					  {% endif %}
+					  <li><h4>Тип деятельности: {{ achievement.achievement.activity }}</h4></li>
+					  <li><h4>Уровень мероприятия: {{ achievement.achievement.level }}</h4></li>
+					  <li><h4>Занимаемая роль: {{ achievement.achievement.role }}</h4></li>
 					</ul>
 				  </div>
-				  {% if not ticket.can_use %}
-				  <form action="{% url 'confirm_use' %}?ticket_id={{ ticket.id_for_use }}&next={{ request.path }}" method="post" onsubmit="window.mytest2()">
-					{% csrf_token %}
-					<button type="submit" class="btn btn-secondary">использовать</button>
-				  </form>
-				  <script type="text/javascript">window.mytest2 = function() { var isValid = confirm('Вы уверены, что хотите использовать талон?\
-				   Данное действие необратимо и кастелян будет иметь доступ к нему.');if (!isValid) { event.preventDefault();  alert("Действие отменено");}}</script>
-				  {% endif %}
 				</div>
 			  </div>
 		  {% endfor %}
-	
 		</div>
 	  </main>
+	  <script>
+		window.addEventListener('DOMContentLoaded', function() {
+			var thumbnails = document.querySelectorAll('.thumbnail');
+			thumbnails.forEach(function(thumbnail) {
+				thumbnail.addEventListener('click', function(event) {
+					event.preventDefault();
+					var imageURL = this.querySelector('a').getAttribute('href');
+					window.open(imageURL, '_blank');
+				});
+			});
+		});
+	</script>
 {% endblock content %}

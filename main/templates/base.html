@@ -60,8 +60,9 @@
               {%endif%}
             </header>
             <ul>
-              <li><a href="index.html">Главная</a></li>
+              <li><a href="{% url 'home' %}">Главная</a></li>
               <li><a href="{% url 'profile' %}">Профиль</a></li>
+              <li><a href="{% url 'download_achieve' %}">Загрузка достижений</a></li>
               <li><a href="#">Модерация</a></li>
               <li>
                 <span class="opener">Положения</span>

@@ -26,11 +26,21 @@ class SnilsWidget(forms.MultiWidget):
     
     def render(self, name, value, attrs=None, renderer = None):
         """Просто html код, чтобы напрямую задать вид поля ввода СНИЛС."""
-        htmltext = '<div id="div_id_snils" class="form-group"> <label class=" requiredField"></label>\
-    <p>\
-    \
-   В формате (XXX-XXX-XXX XX)\
-</p><div class="row gtr-uniform"><input class="col-1 col-12-small" type="text" name="snils_0"  size="3" maxlength="3" required="" id="id_snils_0">-<input class="col-1 col-12-xsmall" type="text" name="snils_1" size="3" maxlength="3" required="" id="id_snils_1">-<input class="col-1 col-12-xsmall" type="text" name="snils_2" size="3" maxlength="3" required="" id="id_snils_2">   <input class="col-1 col-12-xsmall" type="text" name="snils_3" size="2" maxlength="2" required="" id="id_snils_3"></div> </div>'
+        htmltext = '\
+            <div id="div_id_snils" class="form-group">\
+                <label class=" requiredField"></label>\
+                <p>В формате (XXX-XXX-XXX XX)</p>\
+                <div class="row gtr-uniform">\
+                    <input class="col-1 col-12-small"\
+                        type="text" name="snils_0" size="3" maxlength="3" required="" id="id_snils_0">-\
+                    <input class="col-1 col-12-xsmall"\
+                        type="text" name="snils_1" size="3" maxlength="3" required="" id="id_snils_1">-\
+                    <input class="col-1 col-12-xsmall"\
+                        type="text" name="snils_2" size="3" maxlength="3" required=""id="id_snils_2">\
+                    <input class="col-1 col-12-xsmall"\
+                        type="text" name="snils_3" size="2"maxlength="2" required="" id="id_snils_3">\
+                </div>\
+            </div>'
         return htmltext
     
 class SnilsField(forms.MultiValueField):

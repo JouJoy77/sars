@@ -23,6 +23,18 @@ section, summary, time, mark, audio, video {
   font: inherit;
   vertical-align: baseline; }
 
+.thumbnail {
+    width: 200px;
+    height: auto; /* Автоматический расчет высоты для сохранения пропорций */
+    overflow: hidden; /* Скрытие выходящей за пределы области изображения */
+}
+
+.thumbnail img {
+    width: 100%; /* Заполнение всей доступной ширины внутри миниатюры */
+    height: auto; /* Автоматический расчет высоты для сохранения пропорций */
+    display: block; /* Установка в блочный элемент для корректного отображения */
+}
+
 article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
   display: block; }

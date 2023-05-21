@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
+from docs.models import Achievement
 from .models import User
 
 from users.models import Profile
@@ -26,11 +27,13 @@ def register(request):
 
 #вьюшка для просмотря профиля, с декоратором только для залогиненных пользователей
 @login_required
-def profile(request): 
+def profile(request):
     prof = Profile.objects.order_by('id')
     user_id = request.user.pk
+    achievements = Achievement.objects.filter(user_id=user_id).all()
     context = {
         'Name': 'Профиль',
         'profiles': prof,
+        'achievements': achievements
     }
     return render(request, 'profile.html', context)

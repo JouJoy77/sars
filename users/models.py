@@ -5,23 +5,6 @@ from django.urls import reverse
 
 # from django.utils.translation import ugettext_lazy as _
 
-class Achievement(models.Model):
-    """Достижение, доступное для получения"""
-    title = models.CharField(
-        max_length=255,
-        verbose_name='Наименование',
-        null=True
-    )
-    description = models.TextField(verbose_name='Описание', null=True)
-    price = models.DecimalField('Цена', decimal_places=2, max_digits=5, null=True)
-
-
-    class Meta:
-        verbose_name = 'Талоны пользователей'
-        verbose_name_plural = 'Талоны пользователей'
-
-    def __str__(self) -> str:
-        return f'{self.user_id} - {self.title}/{str(self.id_for_use)[-4:]}'
 
 #вспомогательный класс-менеджер для использования модели пользователей
 class UserManager(BaseUserManager):
@@ -86,21 +69,3 @@ def create_user_profile(sender, instance, created, **kwargs):
         Profile.objects.create(user=instance)
 
 post_save.connect(create_user_profile, sender=User)
-
-class AchievementOfUser(models.Model):
-    """Достижение пользователя"""
-    user_id = models.ForeignKey(to=User, on_delete=models.CASCADE, verbose_name='Покупатель')
-    title = models.CharField(
-        max_length=255,
-        verbose_name='Наименование',
-        null=True
-    )
-    description = models.TextField(verbose_name='Описание', null=True)
-    price = models.DecimalField('Цена', decimal_places=2, max_digits=5, null=True)
-
-    class Meta:
-        verbose_name = 'Талоны пользователей'
-        verbose_name_plural = 'Талоны пользователей'
-
-    def __str__(self) -> str:
-        return f'{self.user_id} - {self.title}/{str(self.id_for_use)[-4:]}'

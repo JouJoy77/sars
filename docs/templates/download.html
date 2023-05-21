@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block title %}
+Загрузка достижений
+{% endblock %}
+{% block content %}
+    <h1>Загрузить достижение</h1>
+    <h3>Примечание: разрешены только файлы формата .jpeg, .jpg, .png.</h3>
+    <h3>Для возможности автоматической проверки загружайте документы, которые можно прочесть, не переворачивая</h3>
+    <div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
+        <div class="card mb-4 rounded-3 shadow-sm">
+            <div class="card-body">
+                <h3>Правильно:</h3>
+                <div class="thumbnail">
+                    <a href="{% static 'images/good.jpg' %}" target="_blank">
+                        <img src="{% static 'images/good.jpg' %}" alt="Изображение">
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="card mb-4 rounded-3 shadow-sm">
+            <div class="card-body">
+                <h3>Неправильно:</h3>
+                <div class="thumbnail">
+                    <a href="{% static 'images/bad.jpg' %}" target="_blank">
+                        <img src="{% static 'images/bad.jpg' %}" alt="Изображение">
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Загрузить</button>
+    </form>
+{% endblock %}

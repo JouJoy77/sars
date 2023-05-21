@@ -16,9 +16,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from pathlib import Path
 from main import views
 from users import views as user_views
 from django.contrib.auth import views as auth_views
+from docs import views as docs_views
+from django.conf import settings
+from django.conf.urls.static import static
 
 
 #пути сайта - ссылки и их отображения в формате
@@ -30,4 +34,9 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(template_name='logout.html'), name='logout'),
     path('profile/', user_views.profile, name='profile'),
+    path('download/', docs_views.DownloadAchievementView.as_view(), name='download_achieve')
+    # path('download/', docs_views.download_achieve, name='download_achieve'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
