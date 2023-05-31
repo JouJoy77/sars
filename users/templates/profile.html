@@ -1,48 +1,56 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
-{% block title %}
-Профиль
-{% endblock %}
+{% block title %} Профиль {% endblock %}
 {% block content %}
-	<div class="content-section">
-      	<h2 class="account-heading">{{ user.first_name }} {{user.last_name}}</h2>
-  	    <!-- <p class="text-secondary">{{ user.email }}</p>
+<div class="content-section">
+  <h2 class="account-heading">{{ user.first_name }} {{user.last_name}}</h2>
+  <!-- <p class="text-secondary">{{ user.email }}</p>
 		<p class="text-secondary">{{ user.username }}</p>
 		<p class="text-secondary">{{ user.hostel }}</p> -->
-  	</div>
-	  <main>
-		<div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
-		  {% for achievement in achievements %}
-			  <div class="content">
-				<div class="card mb-4 rounded-3 shadow-sm">
-				  <div class="card-body">
-					<h3 class="content">{{ achievement.title }}</h3>
-					<div class="thumbnail">
-						<a href="{{ MEDIA_URL }}{{achievement.get_picture }}" target="_blank">
-							<img src="{{ MEDIA_URL }}{{achievement.get_picture }}" alt="Изображение">
-						</a>
-					</div>
-					<ul class="list-unstyled mt-3 mb-4">
-					  <li><h4>Тип деятельности: {{ achievement.achievement.activity }}</h4></li>
-					  <li><h4>Уровень мероприятия: {{ achievement.achievement.level }}</h4></li>
-					  <li><h4>Занимаемая роль: {{ achievement.achievement.role }}</h4></li>
-					</ul>
-				  </div>
-				</div>
-			  </div>
-		  {% endfor %}
-		</div>
-	  </main>
-	  <script>
-		window.addEventListener('DOMContentLoaded', function() {
-			var thumbnails = document.querySelectorAll('.thumbnail');
-			thumbnails.forEach(function(thumbnail) {
-				thumbnail.addEventListener('click', function(event) {
-					event.preventDefault();
-					var imageURL = this.querySelector('a').getAttribute('href');
-					window.open(imageURL, '_blank');
-				});
-			});
-		});
-	</script>
+</div>
+<main>
+  <div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
+    {% for achievement in achievements %}
+    <div class="box">
+      <div class="card mb-4 rounded-3 shadow-sm">
+        <div class="card-body">
+          <h3 class="content">{{ achievement.title }}</h3>
+          <div class="thumbnail">
+            <a href="{{ MEDIA_URL }}{{achievement.get_picture }}" target="_blank">
+              <img src="{{ MEDIA_URL }}{{achievement.get_picture }}" alt="Изображение" />
+            </a>
+          </div>
+          <ul class="list-unstyled mt-3 mb-4">
+            <li><h4>Тип деятельности: {{ achievement.achievement.activity }}</h4></li>
+            <li><h4>Уровень мероприятия: {{ achievement.achievement.level }}</h4></li>
+            <li><h4>Занимаемая роль: {{ achievement.achievement.role }}</h4></li>
+            {% if achievement.is_moderated %}
+            <li><h4 class="moderated">Подтверждено модератором</h4></li>
+            {% else %}
+				{% if achievement.is_accepted %}
+            		<li><h4 class="system-accepted">Подтверждено системой</h4></li>
+            	{% else %}
+            		<li><h4 class="not-accepted">Не подтверждено или ожидает модерации</h4></li>
+				{% endif %}
+            {% endif %}
+			<li><h4>Баллы: {{ achievement.get_points }}</h4></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</main>
+<script>
+  window.addEventListener("DOMContentLoaded", function () {
+    var thumbnails = document.querySelectorAll(".thumbnail");
+    thumbnails.forEach(function (thumbnail) {
+      thumbnail.addEventListener("click", function (event) {
+        event.preventDefault();
+        var imageURL = this.querySelector("a").getAttribute("href");
+        window.open(imageURL, "_blank");
+      });
+    });
+  });
+</script>
 {% endblock content %}

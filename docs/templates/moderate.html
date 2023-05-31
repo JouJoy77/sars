@@ -1,0 +1,57 @@
+<!-- moderate.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Moderation Page</h1>
+  <form method="get" action="{% url 'moderate' %}">
+    <select name="activity">
+        <option value="">Деятельность</option>
+      {% for act in activity %}        
+      <option value="{{act}}">{{act}}</option>
+        {% endfor %}
+      <!-- Add more options for categories as needed -->
+    </select>
+    <input type="submit" value="Фильтрация">
+  </form>
+  {% if achievements %}
+    <ul>
+      {% for achievement in achievements %}
+      {% if achievement.achievement.activity.name == request.GET.activity %}
+      <div class="box">
+        <div class="card mb-4 rounded-3 shadow-sm">
+          <div class="card-body">
+            <h3 class="content">{{ achievement.title }}</h3>
+            <div class="thumbnail">
+              <a href="{{ MEDIA_URL }}{{achievement.get_picture }}" target="_blank">
+                <img src="{{ MEDIA_URL }}{{achievement.get_picture }}" alt="Изображение" />
+              </a>
+            </div>
+            <ul class="list-unstyled mt-3 mb-4">
+              <li><h4>Тип деятельности: {{ achievement.achievement.activity }}</h4></li>
+              <li><h4>Уровень мероприятия: {{ achievement.achievement.level }}</h4></li>
+              <li><h4>Занимаемая роль: {{ achievement.achievement.role }}</h4></li>
+              {% if achievement.is_moderated %}
+              <li><h4 class="moderated">Подтверждено модератором</h4></li>
+              {% else %}
+                  {% if achievement.is_accepted %}
+                      <li><h4 class="system-accepted">Подтверждено системой</h4></li>
+                  {% else %}
+                      <li><h4 class="not-accepted">Не подтверждено или ожидает модерации</h4></li>
+                  {% endif %}
+              {% endif %}
+              <li><h4>Баллы: {{ achievement.achievement.points }}</h4></li>
+            </ul>
+            {% csrf_token %}
+            <button type="submit" name="approve">Подтвердить</button>
+            <button type="submit" name="reject">Отклонить</button>
+          </div>
+        </div>
+      </div>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No achievements to moderate.</p>
+  {% endif %}
+{% endblock %}

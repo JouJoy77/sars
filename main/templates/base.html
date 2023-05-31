@@ -25,6 +25,7 @@
           <header id="header">
             {% if user.is_authenticated %}
             <a> Ваш рейтинг: {{ user.rating }}</a>
+            <a> Баллы: {{ user.points }}</a>
             <a>Ваш ID (СНИЛС): {{ user.snils}}</a>
             {% else %}
             <a> Ваш рейтинг: неизвестно</a>
@@ -63,7 +64,7 @@
               <li><a href="{% url 'home' %}">Главная</a></li>
               <li><a href="{% url 'profile' %}">Профиль</a></li>
               <li><a href="{% url 'download_achieve' %}">Загрузка достижений</a></li>
-              <li><a href="#">Модерация</a></li>
+              <li><a href="{% url 'moderate' %}">Модерация</a></li>
               <li>
                 <span class="opener">Положения</span>
                 <ul>

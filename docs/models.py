@@ -2,6 +2,8 @@ from django.db import models
 from users.models import User
 from .pic_reader import check_doc
 from django.core.validators import FileExtensionValidator
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 class ActivityChoice(models.Model):
@@ -59,11 +61,14 @@ class Achievement(models.Model):
         verbose_name = 'Достижение пользователя'
         verbose_name_plural = 'Достижения пользователей'
     
-    def calculate_points(self, level, role, activity):
-        if check_doc(self.picture, level, role, activity, self.user):
-            return self.achievement.points
-        else:
-            return 0
+    # def calculate_points(self, level, role, activity):
+    #     if check_doc(self.picture, level, role, activity, self.user):
+    #         return self.achievement.points
+    #     else:
+    #         return 0
+    @property
+    def get_points(self):
+        return self.achievement.points if self.is_moderated or self.is_accepted else 0
         
         
     def save(self, *args, **kwargs):
@@ -80,3 +85,22 @@ class Achievement(models.Model):
 
     def __str__(self):
         return self.title
+
+
+@receiver(post_save, sender=Achievement)
+def update_user_rating(sender, instance, created, **kwargs):
+    #Обновляем пользователю баллы
+    user = instance.user
+    total_points = Achievement.objects.filter(
+        user=user, is_accepted=True).aggregate(
+            total_points=models.Sum('achievement__points'))['total_points']
+    user.points = total_points
+    user.save()
+    #Получаем всех пользователей и обновляем их рейтинг
+    users = User.objects.order_by('-points')
+    for rank, user in enumerate(users, start=1):
+        user.rating = rank
+        user.save()
+    
+# Регистрация сигнала
+post_save.connect(update_user_rating, sender=Achievement)

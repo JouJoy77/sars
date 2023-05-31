@@ -35,6 +35,30 @@ section, summary, time, mark, audio, video {
     display: block; /* Установка в блочный элемент для корректного отображения */
 }
 
+.moderated {
+  color: #3eed3e;
+  font-family: "Roboto Slab", serif;
+  font-weight: 700;
+  line-height: 1.5;
+  margin: 0 0 1em 0; 
+}
+
+.system-accepted {
+  color: #fbd262;
+  font-family: "Roboto Slab", serif;
+  font-weight: 700;
+  line-height: 1.5;
+  margin: 0 0 1em 0; 
+}
+
+.not-accepted {
+  color: #f92e2e;
+  font-family: "Roboto Slab", serif;
+  font-weight: 700;
+  line-height: 1.5;
+  margin: 0 0 1em 0; 
+}
+
 article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
   display: block; }

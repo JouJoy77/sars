@@ -37,3 +37,4 @@ def profile(request):
         'achievements': achievements
     }
     return render(request, 'profile.html', context)
+

@@ -2,6 +2,10 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db.models.signals import post_save
 from django.urls import reverse
+from django.contrib.auth.models import Group
+
+class Role(Group):
+    pass
 
 # from django.utils.translation import ugettext_lazy as _
 
@@ -38,7 +42,7 @@ class UserManager(BaseUserManager):
 
 #модель пользователя
 class User(AbstractUser):
-
+    role_status = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True, related_name='user_role')
     email = models.EmailField(('email address'), max_length=40, unique=True)
     username = models.CharField(max_length=40)
     snils = models.CharField(max_length=20, unique=True)
