@@ -1,6 +1,5 @@
 from django.db import models
 from users.models import User
-from .pic_reader import check_doc
 from django.core.validators import FileExtensionValidator
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -56,6 +55,7 @@ class Achievement(models.Model):
     achievement = models.ForeignKey(to=AvailableAchievement, on_delete=models.CASCADE, verbose_name='Достижение или деятельность')
     is_moderated = models.BooleanField(verbose_name='Проверено модератором', default=False)
     is_accepted = models.BooleanField(verbose_name='Подтверждено системой', default=False)
+    is_rejected = models.BooleanField(verbose_name='Отклонено модератором', default=False)
     
     class Meta:
         verbose_name = 'Достижение пользователя'
@@ -68,12 +68,11 @@ class Achievement(models.Model):
     #         return 0
     @property
     def get_points(self):
-        return self.achievement.points if self.is_moderated or self.is_accepted else 0
+        return self.achievement.points if ((self.is_moderated or self.is_accepted) and not self.is_rejected) else 0
         
         
     def save(self, *args, **kwargs):
         # super(Achievement, self).save(*args, **kwargs)
-        # Вычисление количества баллов и сохранение в поле "points"
         super(Achievement, self).save(*args, **kwargs)
         
     @property
@@ -94,7 +93,7 @@ def update_user_rating(sender, instance, created, **kwargs):
     total_points = Achievement.objects.filter(
         user=user, is_accepted=True).aggregate(
             total_points=models.Sum('achievement__points'))['total_points']
-    user.points = total_points
+    user.points = total_points or 0
     user.save()
     #Получаем всех пользователей и обновляем их рейтинг
     users = User.objects.order_by('-points')

@@ -47,7 +47,7 @@ class User(AbstractUser):
     username = models.CharField(max_length=40)
     snils = models.CharField(max_length=20, unique=True)
     rating = models.IntegerField(null=True, blank=True)
-    points = models.IntegerField(blank=True, default=0)
+    points = models.IntegerField(blank=True, default=0, null=True)
 
     objects = UserManager()
 

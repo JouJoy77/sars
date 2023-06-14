@@ -24,6 +24,9 @@
             <li><h4>Тип деятельности: {{ achievement.achievement.activity }}</h4></li>
             <li><h4>Уровень мероприятия: {{ achievement.achievement.level }}</h4></li>
             <li><h4>Занимаемая роль: {{ achievement.achievement.role }}</h4></li>
+            {% if achievement.is_rejected %}
+            <li><h4 class="not-accepted">Отклонено модератором</h4></li>
+            {% else %}
             {% if achievement.is_moderated %}
             <li><h4 class="moderated">Подтверждено модератором</h4></li>
             {% else %}
@@ -32,6 +35,7 @@
             	{% else %}
             		<li><h4 class="not-accepted">Не подтверждено или ожидает модерации</h4></li>
 				{% endif %}
+            {% endif %}
             {% endif %}
 			<li><h4>Баллы: {{ achievement.get_points }}</h4></li>
           </ul>

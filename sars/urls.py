@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
 from pathlib import Path
 from main import views
 from users import views as user_views
@@ -36,7 +36,10 @@ urlpatterns = [
     path('profile/', user_views.profile, name='profile'),
     path('download/', docs_views.DownloadAchievementView.as_view(), name='download_achieve'),
     # path('download/', docs_views.download_achieve, name='download_achieve'),
-    path('moderate/', docs_views.ModerateView.as_view(), name='moderate')
+    path('moderate/<int:achievement_id>/', docs_views.ModerateView.as_view(), name='moderate_accept'),
+    path('moderate/', docs_views.ModerateView.as_view(), name='moderate'),
+    path('update-status/', docs_views.update_status, name='update_status'),
+    path('download_excel/', views.download_excel, name='download_excel'),
 ]
 
 if settings.DEBUG:

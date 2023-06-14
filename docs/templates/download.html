@@ -32,8 +32,42 @@
         </div>
     </div>
     <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Загрузить</button>
-    </form>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <!-- <input type="file" id="image-input" name="image" multiple onchange="handleImageSelection(this)"> -->
+        <button type="submit">Загрузить</button>
+      </form>
+          
+    <script>
+    document.getElementById('process-button').addEventListener('click', function() {
+    var imageFiles = document.getElementById('image-input').files;
+    for (var i = 0; i < imageFiles.length; i++) {
+      processImage(imageFiles[i]);
+    }
+  });
+  function processImage(imageFile) {
+        // Создание объекта FormData для отправки файла на сервер
+        var formData = new FormData();
+        formData.append('image', imageFile);
+      
+        // Отправка запроса на сервер
+        $.ajax({
+          url: '/process-image/',
+          type: 'POST',
+          data: formData,
+          contentType: false,
+          processData: false,
+          success: function(response) {
+            // Обработка ответа от сервера
+            console.log(response);
+            // Дополнительные действия с результатом easyocr
+          },
+          error: function(xhr, status, error) {
+            // Обработка ошибок при запросе
+            console.error(error);
+          }
+        });
+      }
+      </script>
+      
 {% endblock %}

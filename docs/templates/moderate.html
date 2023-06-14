@@ -6,19 +6,28 @@
   <h1>Moderation Page</h1>
   <form method="get" action="{% url 'moderate' %}">
     <select name="activity">
-        <option value="">Деятельность</option>
+        <option value="">Выберите тип деятельности</option>
       {% for act in activity %}        
       <option value="{{act}}">{{act}}</option>
         {% endfor %}
       <!-- Add more options for categories as needed -->
     </select>
+    <p>
+
+    </p>
+    <!-- <select name="accepted">
+      <option value="">Деятельность</option>
+    {% for act in activity %}        
+    <option value="{{act}}">{{act}}</option>
+      {% endfor %}
+    <Add more options for categories as needed </select> -->
     <input type="submit" value="Фильтрация">
   </form>
   {% if achievements %}
     <ul>
       {% for achievement in achievements %}
       {% if achievement.achievement.activity.name == request.GET.activity %}
-      <div class="box">
+      <div id="achievement-{{ achievement.id }}" class="box">
         <div class="card mb-4 rounded-3 shadow-sm">
           <div class="card-body">
             <h3 class="content">{{ achievement.title }}</h3>
@@ -28,23 +37,25 @@
               </a>
             </div>
             <ul class="list-unstyled mt-3 mb-4">
+              <!-- <form method="post" action="{% url 'update_status'%}"> -->
+                {% csrf_token %}
+              <li><h4>Студент: {{achievement.user.first_name}} {{achievement.user.last_name}}</h4></li>
               <li><h4>Тип деятельности: {{ achievement.achievement.activity }}</h4></li>
               <li><h4>Уровень мероприятия: {{ achievement.achievement.level }}</h4></li>
               <li><h4>Занимаемая роль: {{ achievement.achievement.role }}</h4></li>
-              {% if achievement.is_moderated %}
-              <li><h4 class="moderated">Подтверждено модератором</h4></li>
-              {% else %}
-                  {% if achievement.is_accepted %}
+                {% if achievement.is_accepted %}
                       <li><h4 class="system-accepted">Подтверждено системой</h4></li>
                   {% else %}
                       <li><h4 class="not-accepted">Не подтверждено или ожидает модерации</h4></li>
                   {% endif %}
-              {% endif %}
               <li><h4>Баллы: {{ achievement.achievement.points }}</h4></li>
-            </ul>
-            {% csrf_token %}
-            <button type="submit" name="approve">Подтвердить</button>
-            <button type="submit" name="reject">Отклонить</button>
+              </ul>
+              {%if user.role_status.name == "Руководитель" or user.role_status.name == "Модератор"%}
+              <button type="button" class="approve-button" data-id="{{ achievement.id }}">Подтвердить</button>
+              <button type="button" class="reject-button" data-id="{{ achievement.id }}">Отклонить</button>
+
+              {% endif %}
+              <!-- </form> -->
           </div>
         </div>
       </div>
@@ -52,6 +63,77 @@
       {% endfor %}
     </ul>
   {% else %}
-    <p>No achievements to moderate.</p>
+    <p>Нет достижений для модерации.</p>
   {% endif %}
-{% endblock %}
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    // Обработчик для кнопки "Подтвердить"
+    $('.approve-button').on('click', function() {
+      var achievementId = $(this).data('id');
+      updateAchievementStatus(achievementId, true);
+    });
+  
+    // Обработчик для кнопки "Отклонить"
+    $('.reject-button').on('click', function() {
+      var achievementId = $(this).data('id');
+      updateAchievementStatus(achievementId, false);
+    });
+  
+    // Функция для отправки асинхронного запроса и обновления статуса документа
+    function updateAchievementStatus(achievementId, isAccepted) {
+      // Создаем новый объект XMLHttpRequest
+      var xhr = new XMLHttpRequest();
+      
+      // Устанавливаем метод и URL для запроса
+      xhr.open('POST', '/update-status/', true);
+
+      // Устанавливаем заголовок X-CSRFToken с помощью функции getCookie()
+      xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
+      
+      // Устанавливаем обработчик события onload для обработки успешного ответа
+      xhr.onload = function() {
+        if (xhr.status === 200) {
+          $('#achievement-' + achievementId).remove();
+          // Обработка успешного ответа
+          var response = JSON.parse(xhr.responseText);
+          console.log(response);
+        } else {
+          // Обработка ошибок
+          console.error(xhr.statusText);
+        }
+      };
+      
+      // Устанавливаем обработчик события onerror для обработки ошибок
+      xhr.onerror = function() {
+        console.error('Request failed.');
+      };
+      
+      // Создаем объект FormData и добавляем данные
+      var formData = new FormData();
+      formData.append('achievement_id', achievementId);
+      formData.append('is_accepted', isAccepted);
+      
+      // Отправляем запрос
+      xhr.send(formData);
+    }
+
+    // Функция для получения значения CSRF-токена из куки
+    function getCookie(name) {
+      var cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+          var cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+    
+
+  </script>
+  
+{% endblock content %}

@@ -4,6 +4,8 @@ from django.db import models
 from users.models import User
 from pathlib import Path
 import os
+from celery import shared_task
+from .models import Achievement
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -38,13 +40,17 @@ def get_text_from_picture(file):
     return make_one_str(preprocess_text(make_one_str(text_recognition(file))))
 
 # TODO: Make it
-def check_doc(picture: models.ImageField, level, role, activity, user: User):
-    print("I GO CHECK DOCS")
-    text = get_text_from_picture(picture.name)
-    return (
-        str(level)[:-2] in text
-        and str(role)[:-2] in text
-        and str(activity)[:-2] in text
-        and str(user.first_name)[:-2] in text
-        and str(user.last_name)[:-2] in text
-    )
+@shared_task
+def check_doc(achievement_id):
+    achievement = Achievement.objects.get(pk=achievement_id)
+    text = get_text_from_picture(achievement.picture.name)
+    if (
+        str(achievement.achievement.level)[:-2] in text
+        and str(achievement.achievement.role)[:-2] in text
+        and str(achievement.achievement.activity)[:-2] in text
+        and str(achievement.user.first_name)[:-2] in text
+        and str(achievement.user.last_name)[:-2] in text
+    ):
+        achievement.is_accepted = True
+        achievement.save()
+

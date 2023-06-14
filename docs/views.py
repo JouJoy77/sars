@@ -1,8 +1,8 @@
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.views.generic import CreateView, ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, render, redirect
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.db.models import Q
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -58,6 +58,13 @@ class DownloadAchievementView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.user = self.request.user  # Установка значения поля "user"
+        achievement = form.process_document()  # Вызов метода process_document
+        if achievement:
+            # Дополнительная логика, если необходимо
+            return super().form_valid(form)
+        else:
+            # Логика при невалидной форме
+            return self.form_invalid(form)
         return super().form_valid(form)
     
 class ModerateView(LoginRequiredMixin, ListView):
@@ -68,9 +75,9 @@ class ModerateView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         user = self.request.user
         category = self.request.GET.get('activity')
-        if user.role_status in ['Модератор', 'Руководитель']:
+        if  user and user.role_status and user.role_status.name in ['Модератор', 'Руководитель']:
             # Filter unmoderated and unaccepted documents
-            queryset = Achievement.objects.filter(is_moderated=False, is_accepted=False)
+            queryset = Achievement.objects.filter(is_moderated=False, is_rejected=False)
             # if category:
             #     # Apply category filter using OR condition
             #     queryset = queryset.filter(Q(achievement__activity__name__icontains=category) | Q(achievement__title__icontains=category))
@@ -80,6 +87,23 @@ class ModerateView(LoginRequiredMixin, ListView):
 
         return queryset
     
+    # def post(self, request, *args, **kwargs):
+    #     achievement_id = self.kwargs['achievement_id']
+    #     achievement = Achievement.objects.get(pk=achievement_id)
+
+    #     if 'approve' in request.POST:
+    #         achievement.is_moderated = True
+    #         achievement.is_accepted = True
+    #         achievement.is_rejected = False
+    #     elif 'reject' in request.POST:
+    #         achievement.is_moderated = False
+    #         achievement.is_accepted = False
+    #         achievement.is_rejected = True
+
+    #     achievement.save()
+
+    #     return HttpResponseRedirect(reverse('moderate'))
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
@@ -87,3 +111,51 @@ class ModerateView(LoginRequiredMixin, ListView):
         context['activity'] = ActivityChoice.objects.all()
         
         return context
+    
+from django.http import JsonResponse
+
+
+def update_status(request):
+    if request.method == 'POST':
+        achievement_id = request.POST.get('achievement_id')
+        is_accepted = request.POST.get('is_accepted')
+        achievement = Achievement.objects.get(pk=achievement_id)
+
+        # if 'approve' in request.POST:
+        achievement.is_moderated = bool(is_accepted)
+        achievement.is_accepted = bool(is_accepted)
+        achievement.is_rejected = not bool(is_accepted)
+        # elif 'reject' in request.POST:
+
+        achievement.save()
+
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'success': True})
+        else:
+            # Возвращайте ответ в соответствии с вашими потребностями
+            return redirect('moderate')
+    
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({'success': False, 'error': 'Invalid request'})
+    else:
+        # Возвращайте ответ в соответствии с вашими потребностями
+        return redirect('moderate')
+
+# def update_status(request):
+#     print(request)
+#     if request.method == 'POST' and request.is_ajax():
+#         achievement_id = request.POST.get('achievement_id')
+#         is_accepted = request.POST.get('is_accepted')
+#         achievement = Achievement.objects.get(pk=achievement_id)
+
+#         # if 'approve' in request.POST:
+#         achievement.is_moderated = is_accepted
+#         achievement.is_accepted = is_accepted
+#         achievement.is_rejected = not is_accepted
+#         # elif 'reject' in request.POST:
+
+#         achievement.save()
+
+#         return JsonResponse({'success': True})
+
+#     return JsonResponse({'success': False})
