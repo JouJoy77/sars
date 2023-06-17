@@ -3,7 +3,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h1>Moderation Page</h1>
+  <h1>Ручная проверка</h1>
   <form method="get" action="{% url 'moderate' %}">
     <select name="activity">
         <option value="">Выберите тип деятельности</option>
@@ -15,12 +15,7 @@
     <p>
 
     </p>
-    <!-- <select name="accepted">
-      <option value="">Деятельность</option>
-    {% for act in activity %}        
-    <option value="{{act}}">{{act}}</option>
-      {% endfor %}
-    <Add more options for categories as needed </select> -->
+
     <input type="submit" value="Фильтрация">
   </form>
   {% if achievements %}

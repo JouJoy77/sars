@@ -1,10 +1,5 @@
 {% load static %}
 <!DOCTYPE html>
-<!--
-	Editorial by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
 <html>
   <head>
     <title>{% block title %}{{Name}}{% endblock %}</title>
@@ -24,13 +19,20 @@
           <!-- Header -->
           <header id="header">
             {% if user.is_authenticated %}
-            <a> Ваш рейтинг: {{ user.rating }}</a>
+            <a> Ваш рейтинг: {%if user.rating%}{{ user.rating }}{%else %}Отсутствует{%endif%}</a>
             <a> Баллы: {{ user.points }}</a>
             <a>Ваш ID (СНИЛС): {{ user.snils}}</a>
             {% else %}
             <a> Ваш рейтинг: неизвестно</a>
             <a>Ваш ID (СНИЛС): войдите в систему</a>
             {%endif%}
+            <div class="icons">
+              <img
+                src="{% static 'images/icmit_logo.jpg' %}"
+                alt="Логотип"
+                style="max-width: 70px; max-height: 70px"
+              />
+            </div>
           </header>
 
           <!-- Section -->
@@ -41,13 +43,6 @@
       <!-- Sidebar -->
       <div id="sidebar">
         <div class="inner">
-          <!-- Search -->
-          <!-- <section id="search" class="alt">
-									<form method="post" action="#">
-										<input type="text" name="query" id="query" placeholder="Search" />
-									</form>
-								</section> -->
-
           <!-- Menu -->
           <nav id="menu">
             <header class="major">
@@ -55,9 +50,9 @@
               {% if user.is_authenticated %}
               <a class="button primary" href="{% url 'logout' %}"> Выход </a>
               {% else %}
-            	<a class="button primary fit" href="{% url 'login' %}"> Вход </a>
+              <a class="button primary fit" href="{% url 'login' %}"> Вход </a>
               <p></p>
-            	<a class="button primary fit" href="{% url 'register' %}"> Регистрация </a>
+              <a class="button primary fit" href="{% url 'register' %}"> Регистрация </a>
               {%endif%}
             </header>
             <ul>
@@ -80,13 +75,13 @@
             <header class="major">
               <h2>Нужна помощь?</h2>
             </header>
-            <p>За помощью вы можете обращаться в деканат или председателю студенческого совета</p>
+            <p>За помощью вы можете обращаться в деканат или к председателю студенческого совета</p>
             <ul class="contact">
-              <li class="icon solid fa-envelope"><a href="#">information@untitled.tld</a></li>
-              <li class="icon solid fa-phone">(000) 000-0000</li>
+              <li class="icon solid fa-envelope"><a href="#"> vmk.dep@kpfu.ru</a></li>
+              <li class="icon solid fa-phone">+7 (8432) 33-70-37</li>
               <li class="icon solid fa-home">
-                1234 Somewhere Road #8254<br />
-                Nashville, TN 00000-0000
+                Республика Татарстан, г. Казань,<br />
+                Кремлёвская улица, д. 35, каб. 1004
               </li>
             </ul>
           </section>

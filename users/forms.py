@@ -1,81 +1,50 @@
 from django import forms
 from .models import User
-from django.contrib.auth.forms import UserCreationForm
-from django.core.validators import RegexValidator
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+import re
 
+class SnilsField(forms.CharField):
+    # специальное поле для СНИЛС
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.required = True
+        self.regex = re.compile(r'^(\d{3}-\d{3}-\d{3} \d{2}|\d{11}|\d{3} \d{3} \d{3} \d{2})$')
 
+    def clean(self, value):
+        value = super().clean(value)
+        # Удаляем все нецифровые символы
+        value = re.sub(r'\D', '', value)
+        # Проверяем длину введенного значения
+        if len(value) != 11:
+            raise forms.ValidationError('СНИЛС должен содержать 11 цифр')
+        # Проверяем формат СНИЛС
+        if not self.regex.match(value):
+            raise forms.ValidationError('Некорректный формат СНИЛС')
+        # Проверяем на повторяющиеся цифры
+        for i in range(len(value) - 2):
+            if value[i] == value[i + 1] == value[i + 2]:
+                raise forms.ValidationError('Некорректный номер СНИЛС (повторяющаяся цифра)')
+        # Проверяем контрольное число
+        sum_ = sum(int(value[i]) * (9 - i) for i in range(9))
+        check_digit = int(value[-2:])
+        control_digit = (sum_ % 101) % 100
+        if control_digit != check_digit:
+            raise forms.ValidationError('Некорректное контрольное число СНИЛС')
 
+        return value
 
-class SnilsWidget(forms.MultiWidget):
-    """Виджет для получения СНИЛС."""
-    def __init__(self, first_length=3, second_length=2, attrs=None):
-        widgets = [forms.TextInput(attrs={'size': first_length, 'maxlength': first_length}),
-                   forms.TextInput(attrs={'size': first_length, 'maxlength': first_length}),
-                   forms.TextInput(attrs={'size': first_length, 'maxlength': first_length}),
-                   forms.TextInput(attrs={'size': second_length, 'maxlength': second_length})]
-        super(SnilsWidget, self).__init__(widgets, attrs)
-
-    def decompress(self, value):
-        if value:
-            return [value.first, value.second, value.third, value.fourth]
-        else:
-            return ['0', '1', '2', '3', '4']
-        
-    def format_output(self, rendered_widgets):
-        return f'{rendered_widgets[0]} - {rendered_widgets[1]} - {rendered_widgets[2]} {rendered_widgets[3]}'
-    
-    def render(self, name, value, attrs=None, renderer = None):
-        """Просто html код, чтобы напрямую задать вид поля ввода СНИЛС."""
-        htmltext = '\
-            <div id="div_id_snils" class="form-group">\
-                <label class=" requiredField"></label>\
-                <p>В формате (XXX-XXX-XXX XX)</p>\
-                <div class="row gtr-uniform">\
-                    <input class="col-1 col-12-small"\
-                        type="text" name="snils_0" size="3" maxlength="3" required="" id="id_snils_0">-\
-                    <input class="col-1 col-12-xsmall"\
-                        type="text" name="snils_1" size="3" maxlength="3" required="" id="id_snils_1">-\
-                    <input class="col-1 col-12-xsmall"\
-                        type="text" name="snils_2" size="3" maxlength="3" required=""id="id_snils_2">\
-                    <input class="col-1 col-12-xsmall"\
-                        type="text" name="snils_3" size="2"maxlength="2" required="" id="id_snils_3">\
-                </div>\
-            </div>'
-        return htmltext
-    
-class SnilsField(forms.MultiValueField):
-    """Поле СНИЛС, в него передаются данные и проверяются на валидность."""
-    def __init__(self, first_length, second_length, *args, **kwargs):
-        list_fields = [
-            forms.CharField(
-                validators=[RegexValidator(fr'^[0-9]',
-                    'Вводите только цифры от 0 до 9, по 3 цифры в первых трех полях, 2 цифры в последнем')],
-            ),
-            forms.CharField(
-                validators=[RegexValidator(r'^[0-9]',
-                    'Вводите только цифры от 0 до 9, по 3 цифры в первых трех полях, 2 цифры в последнем')],
-            ),
-            forms.CharField(
-                validators=[RegexValidator(r'^[0-9]',
-                    'Вводите только цифры от 0 до 9, по 3 цифры в первых трех полях, 2 цифры в последнем')],
-            ),
-            forms.CharField(
-                validators=[RegexValidator(r'^[0-9]',
-                    'Вводите только цифры от 0 до 9, по 3 цифры в первых трех полях, 2 цифры в последнем')],
-            ),]
-        super(SnilsField, self).__init__(list_fields, widget=SnilsWidget(first_length, second_length), *args, **kwargs)
-
-    def compress(self, values):
-        """Метод сборки и задания нормального вида СНИЛС."""
-        return f'{values[0]} - {values[1]} - {values[2]} {values[3]}'
-
+class CustomAuthenticationForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].label = 'Ваша электронная почта'
+        self.fields['password'].label = 'Ваш пароль'  # Измененная метка поля password
 
 class UserRegisterForm(UserCreationForm):
     """Форма регистрации пользователей, используется для получения данных от пользователя."""
     email = forms.EmailField(label='Адрес электронной почты')
     first_name = forms.CharField(max_length=50, required=True, label='Имя')
     last_name = forms.CharField(max_length=50, required=True, label='Фамилия')
-    snils = SnilsField(required=True, label='СНИЛС', first_length=3, second_length=2)
+    snils = SnilsField(label='СНИЛС (В формате XXX-XXX-XXX YY)')
     password1 = forms.CharField(widget=forms.PasswordInput, label='Пароль')
     password2 = forms.CharField(widget=forms.PasswordInput, label='Повторите пароль')
 

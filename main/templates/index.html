@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
-    <h1>Добро пожаловать в систему учета достижений студентов (Student Achievement Record System) - SARS</h1>
+    <h2>Добро пожаловать в систему учета достижений студентов (Student Achievement Record System) - SARS</h2>
     <article><strong>Здесь вы сможете загрузить свои достижения, обновить рейтинг и посмотреть свое место в общем рейтинге</strong></article>
-    <a href="{{ download_url }}" class="btn btn-primary">Скачать Excel</a>
+    <a href="{{ download_url }}" class="button primary fit">Скачать Excel</a>
     <div class="table-wrapper">
     <table class="alt">
         <thead>
@@ -25,3 +25,5 @@
     </div>
       
 {% endblock %}
+
+

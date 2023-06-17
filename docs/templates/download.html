@@ -34,7 +34,6 @@
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
-        <!-- <input type="file" id="image-input" name="image" multiple onchange="handleImageSelection(this)"> -->
         <button type="submit">Загрузить</button>
       </form>
           

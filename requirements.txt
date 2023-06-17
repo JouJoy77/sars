@@ -1,10 +1,7 @@
-amqp==5.1.1
 asgiref==3.6.0
-async-timeout==4.0.2
 backports.zoneinfo==0.2.1
 billiard==3.6.4.0
 bootstrap4==0.1.0
-celery==5.2.7
 certifi==2023.5.7
 charset-normalizer==3.1.0
 Choco==1.0.5
